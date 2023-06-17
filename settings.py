@@ -8,4 +8,6 @@ class Settings:
         self.screen_height = 800
         self.bg_color = (230,230,230)
 
+        # Ship seettings.
+        self.ship_speed = 1.5 # Ship moves 1.5 pixel per one while loop.
 
