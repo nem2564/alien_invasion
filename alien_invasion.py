@@ -5,6 +5,7 @@ import pygame
 
 from settings import Settings
 from game_stats import GameStats
+from scoreboard import Scoreboard
 from button import Button
 from ship import Ship
 from bullet import Bullet
@@ -33,6 +34,8 @@ class AlienInvasion:
 
         # Create an instance to store game statistics.
         self.stats = GameStats(self)
+        # Create a scoreboard
+        self.sb = Scoreboard(self)
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
@@ -114,6 +117,20 @@ class AlienInvasion:
         # If so, get rid of the bullet and the alien.
         collisions = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
 
+        # This true of one bullet one alien but in reality bigger bullet can hit multiple aliens.
+        # OR two bullet can collid with aliens during the same pass through loop.
+        # # For single bullet implementation.
+        # if collisions:
+        #     self.stats.score += self.settings.alien_points
+        #     self.sb.prep_score()
+
+        # For all the cases to be covered
+        if collisions:
+            for alines in collisions.values():
+                self.stats.score += self.settings.alien_points * len(alines)
+            self.sb.prep_score()
+
+
         if not self.aliens:
             # No aliens left in the fleet, recreate the fleet and destroy existing bullets.
             self.bullets.empty()
@@ -130,6 +147,9 @@ class AlienInvasion:
             bullet.draw_bullet()
 
         self.aliens.draw(self.screen)
+
+        # Draw the score information.
+        self.sb.show_score()
 
         # Draw the play button if the game is inactive.
         if not self.stats.game_active:
@@ -230,8 +250,9 @@ class AlienInvasion:
         button_clicked = self.play_button.rect.collidepoint(mouse_pos)
         if button_clicked and not self.stats.game_active:
             self.stats.game_active = True
-            # Reset the game stats.
+            # Reset the game stats and scoreboard.
             self.stats.reset_stats()
+            self.sb.prep_score()
 
             # Get rid of any aliens and bullets.
             self.aliens.empty()

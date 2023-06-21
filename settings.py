@@ -25,3 +25,5 @@ class Settings:
         # Fleet direction of 1 represents right and -1 represents left
         self.fleet_direction = 1
 
+        # Scoring
+        self.alien_points = 50
